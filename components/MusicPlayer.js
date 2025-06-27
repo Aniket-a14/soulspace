@@ -22,7 +22,7 @@ const SONGS = [
 
 export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(true)
-  const [isMuted, setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(true)
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
   const [volume, setVolume] = useState(15) 
   const playerRef = useRef(null) 
