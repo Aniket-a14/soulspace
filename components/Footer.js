@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import {RiCopyrightLine} from "react-icons/ri"
 
 export default function Footer({ quoteOfTheDay }) {
   return (
@@ -16,10 +17,9 @@ export default function Footer({ quoteOfTheDay }) {
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
             <blockquote className="text-lg leading-relaxed italic">&quot;{quoteOfTheDay}&quot;</blockquote>
           </div>
-          <div className="flex items-center justify-center space-x-2 text-sm text-white/70">
-            <span>Made with</span>
-            <span className="text-pink-400">♡</span>
-            <span>for your peace of mind</span>
+          <div className="flex pt-2 items-center justify-center space-x-2 text-sm text-white/70">
+            <span><RiCopyrightLine className="text-xl" /> </span>
+            <span>Aniket Saha, All rights reserved.</span>
           </div>
         </div>
       </div>
