@@ -31,7 +31,7 @@ export default function MusicPlayer() {
 
   // Move player to docked position after 1 second
   useEffect(() => {
-    const timer = setTimeout(() => setIsDocked(true), 2000)
+    const timer = setTimeout(() => setIsDocked(true), 1000)
     setShowArrow(true)
     return () => clearTimeout(timer)
   }, [])
@@ -105,8 +105,16 @@ export default function MusicPlayer() {
 
   // Animation variants for sliding up/down
   const playerVariants = {
-    docked: { y: 120, transition: { type: "spring", stiffness: 200, damping: 25 } },
-    visible: { y: 0, transition: { type: "spring", stiffness: 200, damping: 25 } }
+    docked: {
+      y: 120,
+      opacity: 0,
+      transition: { type: "spring", stiffness: 120, damping: 32, duration: 0.6, ease: "easeInOut" }
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 120, damping: 32, duration: 0.6, ease: "easeInOut" }
+    }
   }
 
   return (
@@ -126,7 +134,7 @@ export default function MusicPlayer() {
         </motion.button>
       )}
 
-      {/* Music Player */}
+      {/* Music Player Controls */}
       <AnimatePresence>
         {!isDocked && (
           <motion.div
@@ -135,25 +143,38 @@ export default function MusicPlayer() {
             animate="visible"
             exit="docked"
             variants={playerVariants}
-            className="fixed bottom-4 right-4 z-50"
+            // Centered on mobile, right on desktop
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-4 sm:translate-x-0 z-50"
             ref={playerRef}
           >
-            <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-pink-100 min-w-[340px]">
+            <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-pink-100 min-w-[90vw] max-w-xs sm:min-w-[340px]">
               <div className="flex items-center space-x-2">
-                <button onClick={playPrev} className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-pink-500" title="Previous">
-                  <SkipBack className="w-4 h-4" />
+                <button
+                  onClick={playPrev}
+                  className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-pink-500"
+                  title="Previous"
+                >
+                  <SkipBack className="w-6 h-6" />
                 </button>
-                <button onClick={onPlayPause} className="w-10 h-10 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center text-white">
-                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                <button
+                  onClick={onPlayPause}
+                  className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-400 to-rose-400 flex items-center justify-center text-white"
+                  style={{ minWidth: 48, minHeight: 48 }}
+                >
+                  {isPlaying ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-0.5" />}
                 </button>
-                <button onClick={playNext} className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-pink-500" title="Next">
-                  <SkipForward className="w-4 h-4" />
+                <button
+                  onClick={playNext}
+                  className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-pink-500"
+                  title="Next"
+                >
+                  <SkipForward className="w-6 h-6" />
                 </button>
                 <button
                   onClick={() => setIsMuted(m => !m)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-pink-500"
+                  className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-pink-500"
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                  {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
                 </button>
                 <input
                   type="range"
@@ -171,18 +192,21 @@ export default function MusicPlayer() {
                 </span>
               </div>
             </div>
-            <audio
-              ref={audioRef}
-              src={SONGS[currentSongIndex].src}
-              onEnded={handleEnded}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              autoPlay={isPlaying}
-              className="hidden"
-            />
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Always-mounted audio element */}
+      <audio
+        ref={audioRef}
+        src={SONGS[currentSongIndex].src}
+        onEnded={handleEnded}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        autoPlay={isPlaying}
+        muted={isMuted}
+        style={{ display: "none" }}
+      />
     </>
   )
 }
