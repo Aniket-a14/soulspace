@@ -187,9 +187,12 @@ export default function MusicPlayer() {
                   title="Volume"
                   disabled={isMuted}
                 />
-                <span className="text-base font-semibold text-gray-600 pr-2 truncate max-w-[120px] block">
-                  {SONGS[currentSongIndex]?.trackName || "Unknown"}
-                </span>
+                {/* Song name in a fixed-width container, truncates if too long */}
+                <div className="flex-1 min-w-0 pl-2">
+                  <span className="block text-base font-semibold text-gray-600 truncate text-right max-w-[110px] sm:max-w-[140px]">
+                    {SONGS[currentSongIndex]?.trackName || "Unknown"}
+                  </span>
+                </div>
               </div>
             </div>
           </motion.div>
