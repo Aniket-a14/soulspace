@@ -45,9 +45,12 @@ export default function MoodJournal() {
 
   // Only allow one quote per day
   const fetchRandomQuote = async () => {
-    // Check if today's quote already exists
     const today = getToday()
-    const todayQuote = readingHistory.find((q) => q.date === today)
+    // Always get the latest readingHistory from localStorage
+    const stored = localStorage.getItem("soulspace-data")
+    const userData = stored ? JSON.parse(stored) : {}
+    const latestHistory = userData.readingHistory || []
+    const todayQuote = latestHistory.find((q) => q.date === today)
     if (todayQuote) {
       setCurrentQuote(todayQuote)
       return
@@ -67,17 +70,11 @@ export default function MoodJournal() {
         date: today,
       }
 
-      setCurrentQuote(quoteData)
-
-      // Add to reading history (only one per day)
-      const newHistory = [quoteData, ...readingHistory.filter((q) => q.date !== today)].slice(0, 10)
-      setReadingHistory(newHistory)
-
-      // Update localStorage
-      const stored = localStorage.getItem("soulspace-data")
-      const userData = stored ? JSON.parse(stored) : {}
+      const newHistory = [quoteData, ...latestHistory.filter((q) => q.date !== today)].slice(0, 10)
       userData.readingHistory = newHistory
       localStorage.setItem("soulspace-data", JSON.stringify(userData))
+      setReadingHistory(newHistory)
+      setCurrentQuote(quoteData)
     } catch (error) {
       setCurrentQuote({
         content: "The present moment is the only time over which we have dominion.",
