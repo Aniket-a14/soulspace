@@ -15,6 +15,8 @@ export default function MoodJournal() {
   const [isLoadingQuote, setIsLoadingQuote] = useState(false)
   const [readingHistory, setReadingHistory] = useState([])
 
+  const [storageAvailable, setStorageAvailable] = useState(true)
+
   const moods = [
     { emoji: "😊", label: "Happy" },
     { emoji: "😌", label: "Peaceful" },
@@ -31,7 +33,21 @@ export default function MoodJournal() {
   // Helper to get today's date string
   const getToday = () => new Date().toLocaleDateString()
 
+  // Helper to check localStorage availability
+  function isLocalStorageAvailable() {
+    try {
+      const testKey = "__test__"
+      window.localStorage.setItem(testKey, "1")
+      window.localStorage.removeItem(testKey)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   useEffect(() => {
+    setStorageAvailable(isLocalStorageAvailable())
+    if (!isLocalStorageAvailable()) return
     const stored = localStorage.getItem("soulspace-data")
     if (stored) {
       const userData = JSON.parse(stored)
@@ -117,6 +133,13 @@ export default function MoodJournal() {
 
   return (
     <div className="max-w-6xl mx-auto px-2 sm:px-4">
+      {!storageAvailable && (
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded-xl text-yellow-800 text-center text-sm font-medium">
+          <span>
+            ⚠️ Data is not stored on your device in this browser mode. We are working on a solution for this!
+          </span>
+        </div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
