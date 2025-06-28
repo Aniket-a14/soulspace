@@ -31,7 +31,7 @@ export default function MusicPlayer() {
 
   // Move player to docked position after 1 second
   useEffect(() => {
-    const timer = setTimeout(() => setIsDocked(true), 3000)
+    const timer = setTimeout(() => setIsDocked(true), 2000)
     setShowArrow(true)
     return () => clearTimeout(timer)
   }, [])
