@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function MoodJournal() {
-  const [activeTab, setActiveTab] = useState("read") // "read" or "write"
+  const [activeTab, setActiveTab] = useState("read")
   const [selectedMood, setSelectedMood] = useState("")
   const [journalEntry, setJournalEntry] = useState("")
   const [entries, setEntries] = useState([])
@@ -28,21 +28,31 @@ export default function MoodJournal() {
     { emoji: "✨", label: "Hopeful" },
   ]
 
+  // Helper to get today's date string
+  const getToday = () => new Date().toLocaleDateString()
+
   useEffect(() => {
     const stored = localStorage.getItem("soulspace-data")
     if (stored) {
       const userData = JSON.parse(stored)
       setEntries(userData.journalEntries || [])
       setReadingHistory(userData.readingHistory || [])
-    }
-
-    // Load initial quote for reading
-    if (activeTab === "read") {
-      fetchRandomQuote()
+      // Set currentQuote to today's quote if it exists
+      const todayQuote = (userData.readingHistory || []).find((q) => q.date === getToday())
+      setCurrentQuote(todayQuote || null)
     }
   }, [])
 
+  // Only allow one quote per day
   const fetchRandomQuote = async () => {
+    // Check if today's quote already exists
+    const today = getToday()
+    const todayQuote = readingHistory.find((q) => q.date === today)
+    if (todayQuote) {
+      setCurrentQuote(todayQuote)
+      return
+    }
+
     setIsLoadingQuote(true)
     try {
       const response = await fetch("https://api.quotable.io/random?minLength=50&maxLength=200")
@@ -54,13 +64,13 @@ export default function MoodJournal() {
         author: data.author,
         tags: data.tags,
         timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString(),
+        date: today,
       }
 
       setCurrentQuote(quoteData)
 
-      // Add to reading history
-      const newHistory = [quoteData, ...readingHistory.slice(0, 9)] // Keep last 10
+      // Add to reading history (only one per day)
+      const newHistory = [quoteData, ...readingHistory.filter((q) => q.date !== today)].slice(0, 10)
       setReadingHistory(newHistory)
 
       // Update localStorage
@@ -69,13 +79,12 @@ export default function MoodJournal() {
       userData.readingHistory = newHistory
       localStorage.setItem("soulspace-data", JSON.stringify(userData))
     } catch (error) {
-      console.error("Error fetching quote:", error)
       setCurrentQuote({
         content: "The present moment is the only time over which we have dominion.",
         author: "Thich Nhat Hanh",
         tags: ["mindfulness"],
         timestamp: new Date().toISOString(),
-        date: new Date().toLocaleDateString(),
+        date: today,
       })
     }
     setIsLoadingQuote(false)
@@ -90,7 +99,7 @@ export default function MoodJournal() {
       mood: selectedMood,
       message: journalEntry.trim(),
       timestamp: new Date().toISOString(),
-      date: new Date().toLocaleDateString(),
+      date: getToday(),
     }
 
     const updatedEntries = [newEntry, ...entries]
@@ -125,10 +134,7 @@ export default function MoodJournal() {
       <div className="flex justify-center mb-6 sm:mb-8">
         <div className="bg-white rounded-2xl p-1 sm:p-2 shadow-lg flex overflow-x-auto gap-2">
           <button
-            onClick={() => {
-              setActiveTab("read")
-              if (!currentQuote) fetchRandomQuote()
-            }}
+            onClick={() => setActiveTab("read")}
             className={`px-4 sm:px-8 py-2 sm:py-3 rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
               activeTab === "read"
                 ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
@@ -168,10 +174,14 @@ export default function MoodJournal() {
                   onClick={fetchRandomQuote}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  disabled={isLoadingQuote}
+                  disabled={isLoadingQuote || readingHistory.some((q) => q.date === getToday())}
                   className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-medium shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 text-sm sm:text-base"
                 >
-                  {isLoadingQuote ? "Finding wisdom..." : "New Inspiration"}
+                  {readingHistory.some((q) => q.date === getToday())
+                    ? "Come back tomorrow for more inspiration!"
+                    : isLoadingQuote
+                    ? "Finding wisdom..."
+                    : "New Inspiration"}
                 </motion.button>
               </div>
 
@@ -187,7 +197,7 @@ export default function MoodJournal() {
                   >
                     <div className="text-2xl text-blue-600 mb-4 text-center">✨</div>
                     <blockquote className="text-lg text-gray-800 leading-relaxed italic mb-4">
-                     &quot;{currentQuote.content}&quot;
+                      &quot;{currentQuote.content}&quot;
                     </blockquote>
                     <div className="text-right">
                       <cite className="text-gray-600 font-medium">— {currentQuote.author}</cite>

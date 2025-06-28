@@ -3,20 +3,19 @@
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Play, Pause, Volume2, VolumeX, SkipForward, SkipBack } from "lucide-react"
-import YouTube from "react-youtube"
 
 const SONGS = [
   {
     trackName: "Samay Samjhayega",
-    youtubeId: "6ZwwapPikyQ", 
+    src: "/Samay Samjhayega.mp4",
   },
   {
     trackName: "Tum Prem ho",
-    youtubeId: "Feoea8FQTI0",
+    src: "/Tum Prem Ho.mp4",
   },
   {
     trackName: "Namo Namo",
-    youtubeId: "dx4Teh-nv3A",
+    src: "/Namo Namo.mp4",
   }
 ]
 
@@ -24,57 +23,62 @@ export default function MusicPlayer() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [currentSongIndex, setCurrentSongIndex] = useState(0)
-  const [volume, setVolume] = useState(15) 
-  const playerRef = useRef(null) 
+  const [volume, setVolume] = useState(15)
+  const audioRef = useRef(null)
 
-  const onReady = event => {
-    playerRef.current = event.target 
-    event.target.setVolume(volume)
-    if (isPlaying) event.target.playVideo()
-    else event.target.pauseVideo()
-    if (isMuted) event.target.mute()
-    else event.target.unMute()
-  }
-
- 
   useEffect(() => {
-    if (playerRef.current) {
-      playerRef.current.setVolume(volume)
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100
     }
   }, [volume])
 
-  
   useEffect(() => {
-    if (playerRef.current) {
-      if (isMuted) playerRef.current.mute()
-      else playerRef.current.unMute()
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted
     }
   }, [isMuted])
 
-  
   useEffect(() => {
-    if (
-      playerRef.current &&
-      typeof playerRef.current.playVideo === "function"
-    ) {
-      playerRef.current.playVideo()
-      setIsPlaying(true)
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+      if (isPlaying) {
+        audioRef.current.play()
+      }
     }
+    // eslint-disable-next-line
   }, [currentSongIndex])
 
   const onPlayPause = () => {
     setIsPlaying(prev => {
       const next = !prev
-      if (playerRef.current && typeof playerRef.current.playVideo === "function" && typeof playerRef.current.pauseVideo === "function") {
-        if (next) playerRef.current.playVideo()
-        else playerRef.current.pauseVideo()
+      if (audioRef.current) {
+        if (next) audioRef.current.play()
+        else audioRef.current.pause()
       }
       return next
     })
   }
 
-  const playNext = () => setCurrentSongIndex(i => (i < SONGS.length - 1 ? i + 1 : 0))
-  const playPrev = () => setCurrentSongIndex(i => (i > 0 ? i - 1 : SONGS.length - 1))
+  const playNext = () => {
+    setCurrentSongIndex(i => {
+      const nextIndex = i < SONGS.length - 1 ? i + 1 : 0
+      return nextIndex
+    })
+    setIsPlaying(true)
+  }
+
+  const playPrev = () => {
+    setCurrentSongIndex(i => {
+      const prevIndex = i > 0 ? i - 1 : SONGS.length - 1
+      return prevIndex
+    })
+    setIsPlaying(true)
+  }
+
+  const handleEnded = () => {
+    playNext()
+  }
 
   return (
     <motion.div
@@ -116,19 +120,14 @@ export default function MusicPlayer() {
           </span>
         </div>
       </div>
-      <YouTube
-        videoId={SONGS[currentSongIndex].youtubeId}
-        opts={{
-          height: "0",
-          width: "0",
-          playerVars: {
-            autoplay: 1,
-          },
-        }}
-        onReady={onReady}
-        onPlay={e => setIsPlaying(true)}
-        onPause={e => setIsPlaying(false)}
-        onEnd={playNext}
+      <audio
+        ref={audioRef}
+        src={SONGS[currentSongIndex].src}
+        onEnded={handleEnded}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        autoPlay={isPlaying}
+        className="hidden"
       />
     </motion.div>
   )
