@@ -49,15 +49,16 @@ export default function MusicPlayer() {
   }, [isMuted])
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-      if (isPlaying) {
-        audioRef.current.play()
-      }
-    }
+    // Don't pause or reset currentTime here, just let the audio src change
+    // Play will be handled in onLoadedMetadata if isPlaying is true
     // eslint-disable-next-line
   }, [currentSongIndex])
+
+  const handleLoadedMetadata = () => {
+    if (isPlaying && audioRef.current) {
+      audioRef.current.play().catch(() => {})
+    }
+  }
 
   // Hide player when clicking outside
   useEffect(() => {
@@ -206,6 +207,7 @@ export default function MusicPlayer() {
         onEnded={handleEnded}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
+        onLoadedMetadata={handleLoadedMetadata}
         autoPlay={isPlaying}
         muted={isMuted}
         style={{ display: "none" }}
