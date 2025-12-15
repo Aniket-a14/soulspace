@@ -1,83 +1,80 @@
 # SoulSpace
 
-SoulSpace is your peaceful sanctuary for mood journaling, inner growth, and daily affirmations. Enjoy features like a mood journal, a Peace Garden that grows with your journey, a Peace Jar of gentle affirmations, and relaxing music—all in a calming, responsive web app.
+A digital sanctuary for mental wellness, mood tracking, and inner peace.
 
----
+## Overview
 
-## Features
+SoulSpace is a full-stack web application designed to help users track their emotional journey, find daily inspiration, and visualize their personal growth through a virtual "Peace Garden".
 
-- **Mood Journal:** Write daily entries or read inspirational quotes. Your entries and reading history are saved locally in your browser.
-- **Peace Garden:** Visualize your progress as a growing plant, from seedling to flowering tree, based on your daily visits and journaling activity.
-- **Peace Jar:** Receive peaceful quotes and affirmations at any time to boost your mood.
-- **Music Player:** Listen to calming music while you use the app.
-- **Responsive Design:** Works beautifully on desktop and mobile devices.
+## Architecture
 
----
+This project is organized as a monorepo with cleanly separated frontend and backend applications:
+
+-   **Frontend**: Next.js (React) application with Tailwind CSS for styling and Framer Motion for animations.
+-   **Backend**: Node.js / Express server using Prisma ORM.
+-   **Database**: PostgreSQL.
+
+## Technologies
+
+### Frontend
+-   **Framework**: Next.js 14 (App Router)
+-   **Styling**: Tailwind CSS
+-   **State Management**: React Context (`AuthContext`)
+-   **Animations**: Framer Motion
+-   **HTTP Client**: Axios
+
+### Backend
+-   **Runtime**: Node.js
+-   **Framework**: Express.js
+-   **ORM**: Prisma (v5)
+-   **Authentication**: JSON Web Tokens (JWT) & Bcrypt
+-   **Database**: PostgreSQL
+
+## Prerequisites
+
+-   Node.js (v18+)
+-   PostgreSQL (Local or Remote instance)
 
 ## Getting Started
 
-First, clone the repository and install dependencies:
+### 1. Database Setup
+
+Ensure you have a PostgreSQL database running and have the connection string ready.
+
+### 2. Backend Setup
 
 ```bash
-git clone <your-repo-url>
-cd soulspace
+cd backend
 npm install
-```
 
-Then, run the development server:
+# Create a .env file
+echo "DATABASE_URL=\"postgresql://user:password@localhost:5432/soulspace\"" > .env
+echo "JWT_SECRET=\"your-secret-key\"" >> .env
+echo "PORT=3001" >> .env
+
+# Run database migrations
+npx prisma migrate dev --name init
+
+# Start the server
+npm run dev
+```
+*The backend server runs on `http://localhost:3001`.*
+
+### 3. Frontend Setup
 
 ```bash
+cd frontend
+npm install
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+*The frontend application runs on `http://localhost:3000`.*
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Key Features
 
-You can start editing the main page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
----
-
-## Project Structure
-
-- `app/` – Main Next.js app directory (including layout and global styles)
-- `components/` – UI components like Header, Footer, MoodJournal, PeaceGarden, PeaceJar, WelcomePage, and MusicPlayer
-- `public/` – Static assets (images, icons, etc.)
-
----
-
-## Technologies Used
-
-- [Next.js](https://nextjs.org) – React framework for server-side rendering and static site generation
-- [React](https://react.dev/) – UI library
-- [next/font](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) – For optimized font loading ([Geist](https://vercel.com/font))
-- LocalStorage – For saving journal entries and reading history
-
----
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) – Learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) – An interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) – your feedback and contributions are welcome!
-
----
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+-   **Authentication**: Secure Signup and Login system.
+-   **Mood Journal**: Track daily moods and thoughts. Entries are stored securely.
+-   **Peace Garden**: Visual representation of your consistency. The garden grows as you visit daily.
+-   **Peace Jar**: Get random daily affirmations and quotes.
+-   **Reading History**: Save and revisit your favorite quotes.

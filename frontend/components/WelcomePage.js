@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 
-export default function WelcomePage({ dayCount, quoteOfTheDay, onEnter }) {
+import Link from "next/link"
+
+export default function WelcomePage({ dayCount, quoteOfTheDay, onEnter, user }) {
   // Store dot positions in state
   const [dotPositions, setDotPositions] = useState([])
 
@@ -55,10 +57,14 @@ export default function WelcomePage({ dayCount, quoteOfTheDay, onEnter }) {
           transition={{ duration: 1, delay: 0.3 }}
           className="mb-8"
         >
-          <h2 className="text-3xl md:text-4xl font-light text-white mb-4">Welcome back to your sanctuary</h2>
-          <div className="text-8xl md:text-9xl font-thin text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-4">
-            Day {dayCount}
-          </div>
+          <h2 className="text-3xl md:text-4xl font-light text-white mb-4">
+            {user ? "Welcome back to your sanctuary" : "Begin your journey to inner peace"}
+          </h2>
+          {user && (
+            <div className="text-8xl md:text-9xl font-thin text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400 mb-4">
+              Day {dayCount}
+            </div>
+          )}
         </motion.div>
 
         <motion.div
@@ -73,17 +79,43 @@ export default function WelcomePage({ dayCount, quoteOfTheDay, onEnter }) {
           </div>
         </motion.div>
 
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onEnter}
-          className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-12 py-4 rounded-full text-xl font-medium shadow-2xl hover:shadow-pink-500/25 transition-all duration-300"
         >
-          Enter Your Sanctuary
-        </motion.button>
+          {user ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onEnter}
+              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-12 py-4 rounded-full text-xl font-medium shadow-2xl hover:shadow-pink-500/25 transition-all duration-300"
+            >
+              Enter Your Sanctuary
+            </motion.button>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/login">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-white text-purple-900 px-12 py-4 rounded-full text-xl font-medium shadow-xl hover:bg-gray-50 transition-all duration-300 min-w-[200px]"
+                >
+                  Log In
+                </motion.button>
+              </Link>
+              <Link href="/signup">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-12 py-4 rounded-full text-xl font-medium shadow-xl hover:shadow-pink-500/25 transition-all duration-300 min-w-[200px]"
+                >
+                  Sign Up
+                </motion.button>
+              </Link>
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   )
