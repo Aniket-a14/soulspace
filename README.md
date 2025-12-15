@@ -78,3 +78,19 @@ npm run dev
 -   **Peace Garden**: Visual representation of your consistency. The garden grows as you visit daily.
 -   **Peace Jar**: Get random daily affirmations and quotes.
 -   **Reading History**: Save and revisit your favorite quotes.
+
+## Contributing
+
+We welcome contributions! Please check out our [Contribution Guidelines](CONTRIBUTING.md) for details on how to get started, our code of conduct, and the pull request process.
+
+## CI/CD
+
+This project uses **GitHub Actions** for continuous integration. The pipeline automatically:
+-   Installs dependencies for both frontend and backend.
+-   Runs linting checks on the frontend.
+-   Verifies the backend Prisma client generation.
+-   Builds the frontend application to ensure deployability.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
